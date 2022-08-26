@@ -18,6 +18,8 @@ Made in Python using the Arcade engine.
 * The game ends when either board fills up. The winner is the player with the highest score.
 * Press the "R" key to start a new game.
 
+![Screen Shot 2022-08-26 at 3 53 01 PM](https://user-images.githubusercontent.com/29261200/187005343-8deece7f-35bd-4c79-a3ad-6c3c58b792ae.png)
+
 ## Roadmap
 
 ### Visuals
