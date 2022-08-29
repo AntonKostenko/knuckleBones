@@ -49,14 +49,15 @@ class Dice(arcade.Sprite):
             self.center_y = destination_position[1]
             self.change_y = 0
 
-    def shrink_dice(self) -> None:
+    def shrink_dice(self) -> bool:
         """
         Reduces the scale of a die and destroy it once it is small.
         Used to animate a die being attacked by the opposite player
+        Returns True if a die was killed, so we can recalculate the score
         """
         self.color = arcade.color.CARMINE_PINK
         if self.scale < 0.2:
             self.kill()
-            return
+            return True
 
         self.scale -= 0.05

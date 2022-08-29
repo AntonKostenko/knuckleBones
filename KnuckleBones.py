@@ -213,7 +213,8 @@ class KnuckleBones(arcade.Window):
         All the logic to move, and the game logic goes here.
         """
         self.move_current_dice_to_position()
-        self.filter_dice()
+        if self.filter_dice():
+            self.calculate_score()
         self.move_remaining_dice_to_position()
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -273,6 +274,19 @@ class KnuckleBones(arcade.Window):
             dice.position = c.TOP_TRAY_X, c.TOP_TRAY_Y
             self.player_two_current_dice = dice
 
+    def set_multiplier_colors(self) -> None:
+        """
+        Modifies the color of the dice if the column has multiple dice with the same value.
+        """
+        dice_count = self.get_dice_value_count(self.dice_list[self.temp_column_index])
+        if 3 in dice_count.values():
+            for dice in self.dice_list[self.temp_column_index]:
+                dice.color = arcade.color.BALL_BLUE
+        elif 2 in dice_count.values():
+            for dice in self.dice_list[self.temp_column_index]:
+                if dice.value == list(dice_count.keys())[list(dice_count.values()).index(2)]:
+                    dice.color = arcade.color.AFRICAN_VIOLET
+
     def perform_turn(self, x: int, y: int) -> None:
         """
         The workhorse method of the game logic. Places the current dice, calls methods to filter dice and update score
@@ -295,6 +309,8 @@ class KnuckleBones(arcade.Window):
                 self.dice_list[column_index].append(self.current_dice)
                 self.dice_group[column_index].append(self.current_dice.value)
 
+                self.set_multiplier_colors()
+
                 self.remove_values_from_list()
 
                 self.calculate_score()
@@ -316,7 +332,7 @@ class KnuckleBones(arcade.Window):
         eg.: column = [1, 1, 1]. column score =  9 (1 * 3 * 3)
         """
         for index, (player_one_column, player_two_column) in enumerate(
-                zip(self.player_one_dice_group, self.player_two_dice_group)):
+                zip(self.player_one_dice_list_group, self.player_two_dice_list_group)):
             self.player_one_column_scores[index] = 0
             self.player_two_column_scores[index] = 0
 
@@ -332,7 +348,7 @@ class KnuckleBones(arcade.Window):
         self.player_two_score = sum(self.player_two_column_scores)
 
     @staticmethod
-    def get_dice_value_count(player_column: List[int]) -> dict[int, int]:
+    def get_dice_value_count(player_column: arcade.SpriteList) -> dict[int, int]:
         """
         Counts the dice occurrence in a column. Used later to determine a score multiplier
         :param player_column: the column in the player dice group
@@ -341,10 +357,10 @@ class KnuckleBones(arcade.Window):
         player_dict: dict[int, int] = {}
 
         for dice in player_column:
-            if dice in player_dict:
-                player_dict[dice] += 1
+            if dice.value in player_dict:
+                player_dict[dice.value] += 1
             else:
-                player_dict[dice] = 1
+                player_dict[dice.value] = 1
         return player_dict
 
     def remove_values_from_list(self) -> None:
@@ -355,15 +371,16 @@ class KnuckleBones(arcade.Window):
                                                             self.opposite_dice_group[self.temp_column_index] if
                                                             value != self.dice_list[self.temp_column_index][-1].value]
 
-    def filter_dice(self) -> None:
+    def filter_dice(self) -> bool:
         """
         Takes a SpriteList opposite of the current dice column and animates removing
         dice containing the value of the current dice.
-        Used to update dice when the player attacks
+        Used to update dice when the player attacks.
+        Returns True if a die was destroyed, so we can recalculate the score
         """
         for dice in self.opposite_dice_list[self.temp_column_index]:
             if dice.value == self.current_dice.value:
-                dice.shrink_dice()
+                return dice.shrink_dice()
 
     def move_current_dice_to_position(self):
         """
