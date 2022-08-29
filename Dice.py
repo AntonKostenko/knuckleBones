@@ -1,5 +1,6 @@
 import math
 import arcade
+from typing import Tuple
 
 import constants as c
 
@@ -14,9 +15,13 @@ class Dice(arcade.Sprite):
 
         super().__init__(self.image_file_name, scale, hit_box_algorithm="None")
 
-    def move_sprite(self, position):
+    def move_dice(self, destination_position: Tuple) -> None:
+        """
+        animates moving a die from its current position to the
+        destination_position passed in
+        """
         # Only move if needed
-        if self.position == position:
+        if self.position == destination_position:
             return
 
         self.center_x += self.change_x
@@ -27,8 +32,8 @@ class Dice(arcade.Sprite):
 
         # Calculate the angle between the start points
         # and end points. This is the angle the dice will travel.
-        x_diff = position[0] - start_x
-        y_diff = position[1] - start_y
+        x_diff = destination_position[0] - start_x
+        y_diff = destination_position[1] - start_y
         angle = math.atan2(y_diff, x_diff)
 
         # Taking into account the angle, calculate our change_x
@@ -37,9 +42,21 @@ class Dice(arcade.Sprite):
         self.change_y = math.sin(angle) * self.speed
 
         # If we are close, lock in the position so the dice does not vibrate
-        if abs(self.center_x - position[0]) < abs(self.change_x):
-            self.center_x = position[0]
+        if abs(self.center_x - destination_position[0]) < abs(self.change_x):
+            self.center_x = destination_position[0]
             self.change_x = 0
-        if abs(self.center_y - position[1]) < abs(self.change_y):
-            self.center_y = position[1]
+        if abs(self.center_y - destination_position[1]) < abs(self.change_y):
+            self.center_y = destination_position[1]
             self.change_y = 0
+
+    def shrink_dice(self) -> None:
+        """
+        Reduces the scale of a die and destroy it once it is small.
+        Used to animate a die being attacked by the opposite player
+        """
+        print(self.scale)
+        if self.scale < 0.2:
+            self.kill()
+            return
+
+        self.scale -= 0.1

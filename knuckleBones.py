@@ -213,6 +213,7 @@ class KnuckleBones(arcade.Window):
         All the logic to move, and the game logic goes here.
         """
         self.move_current_dice_to_position()
+        self.filter_dice()
         self.move_remaining_dice_to_position()
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -295,7 +296,6 @@ class KnuckleBones(arcade.Window):
                 self.dice_group[column_index].append(self.current_dice.value)
 
                 self.remove_values_from_list()
-                self.filter_dice()
 
                 self.calculate_score()
 
@@ -357,21 +357,20 @@ class KnuckleBones(arcade.Window):
 
     def filter_dice(self) -> None:
         """
-        Takes a SpriteList and removes sprites containing the value of the current dice.
-        Used to update dice when the opposite player attacks
+        Takes a SpriteList opposite of the current dice column and animates removing
+        dice containing the value of the current dice.
+        Used to update dice when the player attacks
         """
-        dice_list = arcade.SpriteList()
         for dice in self.opposite_dice_list[self.temp_column_index]:
-            if dice.value != self.current_dice.value:
-                dice_list.append(dice)
-        self.opposite_dice_list[self.temp_column_index] = dice_list
+            if dice.value == self.current_dice.value:
+                dice.shrink_dice()
 
     def move_current_dice_to_position(self):
         """
         Animate the dice moving from the start position to the position on the board
         """
         if isinstance(self.current_dice, Dice) and self.temp_sprite_destination != ():
-            self.current_dice.move_sprite(self.temp_sprite_destination)
+            self.current_dice.move_dice(self.temp_sprite_destination)
 
     def move_remaining_dice_to_position(self) -> None:
         """
@@ -380,8 +379,8 @@ class KnuckleBones(arcade.Window):
         if 0 < len(self.opposite_dice_list[self.temp_column_index]) < 3:
             remaining_dice: Dice
             for dice_index, remaining_dice in enumerate(self.opposite_dice_list[self.temp_column_index]):
-                remaining_dice.speed = 15
-                remaining_dice.move_sprite(self.opposite_tile_group[self.temp_column_index][dice_index].position)
+                remaining_dice.speed = 20
+                remaining_dice.move_dice(self.opposite_tile_group[self.temp_column_index][dice_index].position)
 
     def is_board_full(self) -> bool:
         """
