@@ -55,7 +55,7 @@ class Dice(arcade.Sprite):
         Used to animate a die being attacked by the opposite player
         Returns True if a die was killed, so we can recalculate the score
         """
-        self.color = arcade.color.CARMINE_PINK
+        self.color = c.ATTACKED_DICE_COLOR
         if self.scale < 0.2:
             self.kill()
             return True
