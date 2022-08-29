@@ -36,20 +36,12 @@ class KnuckleBones(arcade.Window):
         # List of sprite lists that make up player 1's tile board
         self.player_one_tile_group = None
 
-        # List of lists used to keep score of player 1's columns
-        self.player_one_dice_group = None
-
         # List of sprite lists that make up player 2's tile board
         self.player_two_tile_group = None
-
-        # List of lists used to keep score of player 2's columns
-        self.player_two_dice_group = None
 
         # Temp vars used to update player's dice and scores
         self.current_dice = None
         self.tile_group = None
-        self.dice_group = None
-        self.opposite_dice_group = None
         self.dice_list = None
         self.opposite_dice_list = None
         self.opposite_tile_group = None
@@ -86,24 +78,16 @@ class KnuckleBones(arcade.Window):
                                                                arcade.SpriteList(),
                                                                arcade.SpriteList()]
 
-        # List of lists used to keep score of player 1's columns
-        self.player_one_dice_group: List[List[int]] = [[], [], []]
-
         # List of sprite lists that make up player 2's tile board
         self.player_two_tile_group: List[arcade.SpriteList] = [arcade.SpriteList(),
                                                                arcade.SpriteList(),
                                                                arcade.SpriteList()]
-
-        # List of lists used to keep score of player 2's columns
-        self.player_two_dice_group: List[List[int]] = [[], [], []]
 
         # Temp vars used to update player's dice and scores
         self.current_dice: arcade.Sprite = arcade.Sprite()
         self.tile_group: List[arcade.SpriteList] = [arcade.SpriteList(),
                                                     arcade.SpriteList(),
                                                     arcade.SpriteList()]
-        self.dice_group: List[List[int]] = [[], [], []]
-        self.opposite_dice_group: List[List[int]] = [[], [], []]
         self.dice_list: List[arcade.SpriteList] = [arcade.SpriteList(),
                                                    arcade.SpriteList(),
                                                    arcade.SpriteList()]
@@ -229,19 +213,15 @@ class KnuckleBones(arcade.Window):
         if self.current_turn:
             self.current_dice = self.player_one_current_dice
             self.tile_group = self.player_one_tile_group
-            self.dice_group = self.player_one_dice_group
             self.dice_list = self.player_one_dice_list_group
 
-            self.opposite_dice_group = self.player_two_dice_group
             self.opposite_dice_list = self.player_two_dice_list_group
             self.opposite_tile_group = self.player_two_tile_group
         else:
             self.current_dice = self.player_two_current_dice
             self.tile_group = self.player_two_tile_group
-            self.dice_group = self.player_two_dice_group
             self.dice_list = self.player_two_dice_list_group
 
-            self.opposite_dice_group = self.player_one_dice_group
             self.opposite_dice_list = self.player_one_dice_list_group
             self.opposite_tile_group = self.player_one_tile_group
 
@@ -298,7 +278,7 @@ class KnuckleBones(arcade.Window):
         for column_index in range(len(self.tile_group)):
             tile_location = arcade.get_sprites_at_point((x, y), self.tile_group[column_index])
             # If the column has an open spot for the dice, place dice in the lowest/highest open spot.
-            if len(tile_location) > 0 and len(self.dice_group[column_index]) < 3:
+            if len(tile_location) > 0 and len(self.dice_list[column_index]) < 3:
 
                 # Used to move current dice in the update() call
                 self.temp_sprite_destination = self.tile_group[column_index][len(self.dice_list[column_index])].position
@@ -307,22 +287,14 @@ class KnuckleBones(arcade.Window):
                 self.temp_column_index = column_index
 
                 self.dice_list[column_index].append(self.current_dice)
-                self.dice_group[column_index].append(self.current_dice.value)
 
                 self.set_multiplier_colors()
-
-                self.remove_values_from_list()
 
                 self.calculate_score()
 
                 if not self.is_board_full():
                     self.current_turn = not self.current_turn
                     self.create_dice(self.current_turn)
-
-                # Prints the column scores for each player. Useful for testing and debugging.
-                # print(self.player_two_dice_group)
-                # print(self.player_one_dice_group)
-                # print()
 
     def calculate_score(self) -> None:
         """
@@ -362,14 +334,6 @@ class KnuckleBones(arcade.Window):
             else:
                 player_dict[dice.value] = 1
         return player_dict
-
-    def remove_values_from_list(self) -> None:
-        """
-        Takes a list on ints and filters out undesired ints. Used to update values when the opposite player attacks
-        """
-        self.opposite_dice_group[self.temp_column_index] = [value for value in
-                                                            self.opposite_dice_group[self.temp_column_index] if
-                                                            value != self.dice_list[self.temp_column_index][-1].value]
 
     def filter_dice(self) -> bool:
         """
