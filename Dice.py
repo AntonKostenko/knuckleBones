@@ -27,14 +27,14 @@ class Dice(arcade.Sprite):
         self.center_x += self.change_x
         self.center_y += self.change_y
 
-        start_x = self.center_x
-        start_y = self.center_y
+        start_x: float = self.center_x
+        start_y: float = self.center_y
 
         # Calculate the angle between the start points
         # and end points. This is the angle the dice will travel.
-        x_diff = destination_position[0] - start_x
-        y_diff = destination_position[1] - start_y
-        angle = math.atan2(y_diff, x_diff)
+        x_diff: float = destination_position[0] - start_x
+        y_diff: float = destination_position[1] - start_y
+        angle: float = math.atan2(y_diff, x_diff)
 
         # Taking into account the angle, calculate our change_x
         # and change_y. Velocity is how fast the dice travels.

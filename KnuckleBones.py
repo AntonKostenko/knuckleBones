@@ -1,7 +1,7 @@
 import arcade
 import random
 
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import constants as c
 from Dice import Dice
@@ -13,7 +13,7 @@ class KnuckleBones(arcade.Window):
 
         arcade.set_background_color(c.BACKGROUND_COLOR)
 
-        self.current_turn: Optional[bool] = None
+        self.current_turn = None
 
         self.player_one_score = None
         self.player_one_column_scores = None
@@ -278,7 +278,7 @@ class KnuckleBones(arcade.Window):
         self.set_turn_values()
 
         for column_index in range(len(self.tile_group)):
-            tile_location = arcade.get_sprites_at_point((x, y), self.tile_group[column_index])
+            tile_location: List[arcade.Sprite] = arcade.get_sprites_at_point((x, y), self.tile_group[column_index])
             # If the column has an open spot for the dice, place dice in the lowest/highest open spot.
             if len(tile_location) > 0 and len(self.dice_list[column_index]) < 3:
 
@@ -310,8 +310,8 @@ class KnuckleBones(arcade.Window):
             self.player_one_column_scores[index] = 0
             self.player_two_column_scores[index] = 0
 
-            player_one_dict = self.get_dice_value_count(player_one_column)
-            player_two_dict = self.get_dice_value_count(player_two_column)
+            player_one_dict: dict[int, int] = self.get_dice_value_count(player_one_column)
+            player_two_dict: dict[int, int] = self.get_dice_value_count(player_two_column)
 
             for key in player_one_dict:
                 self.player_one_column_scores[index] += key * player_one_dict[key] * player_one_dict[key]
@@ -348,7 +348,7 @@ class KnuckleBones(arcade.Window):
             if dice.value == self.current_dice.value:
                 return dice.shrink_dice()
 
-    def move_current_dice_to_position(self):
+    def move_current_dice_to_position(self) -> None:
         """
         Animate the dice moving from the start position to the position on the board
         """
