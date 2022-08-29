@@ -54,9 +54,9 @@ class Dice(arcade.Sprite):
         Reduces the scale of a die and destroy it once it is small.
         Used to animate a die being attacked by the opposite player
         """
-        print(self.scale)
+        self.color = arcade.color.CARMINE_PINK
         if self.scale < 0.2:
             self.kill()
             return
 
-        self.scale -= 0.1
+        self.scale -= 0.05
