@@ -258,14 +258,16 @@ class KnuckleBones(arcade.Window):
         """
         Modifies the color of the dice if the column has multiple dice with the same value.
         """
-        dice_count = self.get_dice_value_count(self.dice_list[self.temp_column_index])
+        dice_count: dict[int, int] = self.get_dice_value_count(self.dice_list[self.temp_column_index])
+        # If the column is full of dice of the same value, set the dice color to the 3x modifier color
         if 3 in dice_count.values():
             for dice in self.dice_list[self.temp_column_index]:
-                dice.color = arcade.color.BALL_BLUE
+                dice.color = c.THREE_X_MOD_COLOR
+        # If the column has 2 dice of the same value, set their color to the 2x modifier color
         elif 2 in dice_count.values():
             for dice in self.dice_list[self.temp_column_index]:
-                if dice.value == list(dice_count.keys())[list(dice_count.values()).index(2)]:
-                    dice.color = arcade.color.AFRICAN_VIOLET
+                if dice_count[dice.value] == 2:
+                    dice.color = c.TWO_X_MOD_COLOR
 
     def perform_turn(self, x: int, y: int) -> None:
         """
