@@ -1,5 +1,7 @@
-import math
 import arcade
+import math
+import random
+
 from typing import Tuple
 
 import constants as c
@@ -9,6 +11,9 @@ class Dice(arcade.Sprite):
     def __init__(self, value, scale=c.DICE_SCALE):
         self.value = value
         self.image_file_name = f'images/dice/Side_{self.value}_Pips.png'
+
+        # Time before dice roll animation stops
+        self.total_roll_time = 0.75
 
         # Max speed
         self.speed = None
@@ -61,3 +66,23 @@ class Dice(arcade.Sprite):
             return True
 
         self.scale -= 0.05
+
+    def roll_dice_animation(self, delta_time) -> None:
+        """
+        Dice roll animation.
+        "Rolls" the current dice by randomly setting the self.center_x and self.center_y
+        and loading different dice textures until the total_roll_time is 0
+        """
+        if self.total_roll_time <= 0:
+            self.set_texture(0)
+            return
+
+        self.total_roll_time -= delta_time
+
+        self.center_x += random.randint(-3, 3)
+        self.center_y += random.randint(-3, 3)
+        for x in range(6):
+            self.append_texture(arcade.load_texture(f'images/dice/Side_{x + 1}_Pips.png'))
+
+        if self.center_x % 2 == 0:
+            self.set_texture(random.randint(0, 6))
