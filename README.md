@@ -24,10 +24,6 @@ Made in Python using the Arcade engine.
 
 ### Visuals
 * Display who goes first
-* Dice roll animation
-* Animate dice being removed
-* Change color of destroyed dice
-* Change color of dice when 2x and 3x multiplier is present
 
 ### Sounds/Effects
 * Background Music

@@ -100,7 +100,7 @@ class KnuckleBones(arcade.Window):
 
         self.temp_dice_list: List = []
         self.temp_sprite_destination: Tuple = ()
-        self.temp_column_index = 0
+        self.temp_column_index: int = 0
 
         # Player 1 dice tray
         bottom_tray: arcade.Sprite = arcade.SpriteSolidColor(c.DICE_TRAY_WIDTH, c.DICE_TRAY_HEIGHT, c.TILE_COLOR)
@@ -128,7 +128,8 @@ class KnuckleBones(arcade.Window):
                 tile.position = c.BOARD_X_START + i * c.TILE_X_SPACING, c.TOP_BOARD_Y + j * c.TILE_Y_SPACING
                 self.player_two_tile_group[i].append(tile)
 
-        self.create_dice(self.goes_first())
+        self.current_turn = self.roll_dice() % 2 == 0
+        self.create_dice()
 
     def on_draw(self):
         self.clear()
@@ -196,6 +197,11 @@ class KnuckleBones(arcade.Window):
         """
         All the logic to move, and the game logic goes here.
         """
+        if self.current_turn:
+            self.player_one_current_dice.roll_dice_animation(delta_time)
+        else:
+            self.player_two_current_dice.roll_dice_animation(delta_time)
+
         self.move_current_dice_to_position()
         if self.filter_dice():
             self.calculate_score()
@@ -232,22 +238,13 @@ class KnuckleBones(arcade.Window):
         """
         return random.randint(1, 6)
 
-    def goes_first(self) -> bool:
-        """
-        Determines which player goes first
-        :return: True - Player 1, False - Player 2
-        """
-        self.current_turn = self.roll_dice() % 2 == 0
-        return self.current_turn
-
-    def create_dice(self, current_turn: bool) -> None:
+    def create_dice(self) -> None:
         """
         Creates a new Dice object and places it on the current turn player's mat
-        :param current_turn: who's turn is it. Used to determine where to place the dice
         """
         dice: Dice = Dice(self.roll_dice())
         dice.speed = 40
-        if current_turn:
+        if self.current_turn:
             dice.position = c.BOTTOM_TRAY_X, c.BOTTOM_TRAY_Y
             self.player_one_current_dice = dice
         else:
@@ -296,7 +293,7 @@ class KnuckleBones(arcade.Window):
 
                 if not self.is_board_full():
                     self.current_turn = not self.current_turn
-                    self.create_dice(self.current_turn)
+                    self.create_dice()
 
     def calculate_score(self) -> None:
         """
