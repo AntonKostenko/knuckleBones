@@ -32,30 +32,36 @@ class InstructionView(arcade.View):
 
         # Create some "mats" under the dice
 
-        left_mat: arcade.Sprite = arcade.SpriteSolidColor(130, 130, c.TILE_COLOR)
-        left_mat.position = c.MATCH_DICE_X_START + c.DICE_DIMENSIONS / 2 + c.DICE_DIMENSIONS * 0.1 , c.INSTRUCTION_DICE_Y_START - c.DICE_DIMENSIONS * 0.75
+        left_mat: arcade.Sprite = arcade.SpriteSolidColor(120, 120, c.TILE_COLOR)
+        left_mat.position = c.INSTRUCTIONS_LEFT_MAT_X, c.INSTRUCTION_MAT_Y
         self.dice_mats.append(left_mat)
 
-        right_mat = arcade.Sprite = arcade.SpriteSolidColor(130, 130, c.TILE_COLOR)
-        right_mat.position = c.DESTROY_DICE_X_START, c.INSTRUCTION_DICE_Y_START - c.DICE_DIMENSIONS * 0.75
+        right_mat = arcade.Sprite = arcade.SpriteSolidColor(120, 120, c.TILE_COLOR)
+        right_mat.position = c.INSTRUCTIONS_RIGHT_MAT_X, c.INSTRUCTION_MAT_Y
         self.dice_mats.append(right_mat)
 
-
         # Create the dice used in the "multiply" rule
-        for i in range(2):
-            dice: Dice = Dice(6)
-            dice.position = c.MATCH_DICE_X_START + (c.DICE_DIMENSIONS + c.DICE_DIMENSIONS * 0.1) * i,\
-                            c.INSTRUCTION_DICE_Y_START - (c.DICE_DIMENSIONS + c.DICE_DIMENSIONS * 0.1) * i
-            dice.color = c.TWO_X_MOD_COLOR
-            self.match_dice.append(dice)
+        mult_dice_one: Dice = Dice(6)
+        mult_dice_one.position = c.INSTRUCTIONS_LEFT_MAT_X - c.DICE_DIMENSIONS / 2,\
+            c.INSTRUCTION_MAT_Y + c.DICE_DIMENSIONS / 2
+        mult_dice_one.color = c.TWO_X_MOD_COLOR
+        self.match_dice.append(mult_dice_one)
+
+        mult_dice_two: Dice = Dice(6)
+        mult_dice_two.position = c.INSTRUCTIONS_LEFT_MAT_X + c.DICE_DIMENSIONS / 2, \
+            c.INSTRUCTION_MAT_Y - c.DICE_DIMENSIONS / 2
+        mult_dice_two.color = c.TWO_X_MOD_COLOR
+        self.match_dice.append(mult_dice_two)
 
         # Create the dice used in the "destroy" rule
-        for i in range(2):
-            dice: Dice = Dice(6)
-            dice.position = c.DESTROY_DICE_X_START, c.INSTRUCTION_DICE_Y_START - (c.DICE_DIMENSIONS +
-                        c.DICE_DIMENSIONS * 0.5) * i
-            dice.color = c.ATTACKED_DICE_COLOR
-            self.destroy_dice.append(dice)
+        destroy_dice_one: Dice = Dice(4)
+        destroy_dice_one.position = c.INSTRUCTIONS_RIGHT_MAT_X, c.INSTRUCTION_MAT_Y + c.DICE_DIMENSIONS * 0.75
+        destroy_dice_one.color = c.ATTACKED_DICE_COLOR
+        self.destroy_dice.append(destroy_dice_one)
+
+        destroy_dice_one: Dice = Dice(4)
+        destroy_dice_one.position = c.INSTRUCTIONS_RIGHT_MAT_X, c.INSTRUCTION_MAT_Y - c.DICE_DIMENSIONS * 0.75
+        self.destroy_dice.append(destroy_dice_one)
 
         # Create the buttons in the page
         for i in range(len(c.INSTRUCTION_BUTTON_NAMES)):
@@ -78,6 +84,9 @@ class InstructionView(arcade.View):
         for mat in self.dice_mats:
             mat.draw()
 
+        arcade.draw_line(c.INSTRUCTIONS_RIGHT_MAT_X - 50, c.INSTRUCTION_MAT_Y,
+                         c.INSTRUCTIONS_RIGHT_MAT_X + 50, c.INSTRUCTION_MAT_Y, c.BACKGROUND_COLOR, 4)
+
         # Draw the dice
         for dice in self.match_dice:
             dice.draw()
@@ -85,20 +94,16 @@ class InstructionView(arcade.View):
             dice.draw()
 
         # Draw the "Match Dice" text
-        arcade.draw_text('Match Dice', c.MATCH_DICE_X_START + c.DICE_DIMENSIONS / 2,
-                         c.INSTRUCTION_DICE_Y_START - c.DICE_DIMENSIONS * 2.2,
+        arcade.draw_text('Match Dice', c.INSTRUCTIONS_LEFT_MAT_X, c.INSTRUCTION_MAT_Y - 100,
                          arcade.color.WHITE, font_size=22, anchor_x="center", anchor_y="center")
-        arcade.draw_text(c.MATCH_DICE_RULE_TEXT, c.MATCH_DICE_X_START + c.DICE_DIMENSIONS / 2,
-                         c.INSTRUCTION_DICE_Y_START - c.DICE_DIMENSIONS * 2.2 - 50, font_size=12,
+        arcade.draw_text(c.MATCH_DICE_RULE_TEXT, c.INSTRUCTIONS_LEFT_MAT_X, c.INSTRUCTION_MAT_Y - 150, font_size=12,
                          anchor_x="center", anchor_y="center", multiline=True, width=290, align='center')
 
         # Draw the "Destroy Dice" text
-        arcade.draw_text('Destroy Opponent', c.DESTROY_DICE_X_START,
-                         c.INSTRUCTION_DICE_Y_START - c.DICE_DIMENSIONS * 2.2,
+        arcade.draw_text('Destroy Opponent', c.INSTRUCTIONS_RIGHT_MAT_X, c.INSTRUCTION_MAT_Y - 100,
                          arcade.color.WHITE, font_size=22, anchor_x="center", anchor_y="center")
-        arcade.draw_text(c.DESTROY_OPPONENT_RULE_TEXT, c.DESTROY_DICE_X_START,
-                         c.INSTRUCTION_DICE_Y_START - c.DICE_DIMENSIONS * 2.2 - 50, font_size=12,
-                         anchor_x="center", anchor_y="center", multiline=True, width=290, align='center')
+        arcade.draw_text(c.DESTROY_OPPONENT_RULE_TEXT, c.INSTRUCTIONS_RIGHT_MAT_X, c.INSTRUCTION_MAT_Y - 150,
+                         font_size=12, anchor_x="center", anchor_y="center", multiline=True, width=290, align='center')
 
         # Draw the menu buttons and their text
         for button in self.menu_buttons:

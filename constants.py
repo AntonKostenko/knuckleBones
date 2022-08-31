@@ -55,9 +55,12 @@ INSTRUCTION_BUTTON_START: float = SCREEN_WIDTH / 2 - INSTRUCTION_BUTTON_SPACING
 INSTRUCTION_BUTTON_NAMES: List[str] = ['Play', 'Back']
 INSTRUCTIONS_SUB_TEXT: str = 'Your score is calculated by adding all your dice together.'
 
+INSTRUCTIONS_LEFT_MAT_X: float = SCREEN_WIDTH / 3 - 50
+INSTRUCTIONS_RIGHT_MAT_X: float = SCREEN_WIDTH * (2 / 3) + 50
+INSTRUCTION_MAT_Y: float = SCREEN_HEIGHT * 0.6
+
 MATCH_DICE_X_START = SCREEN_WIDTH / 3 - DICE_DIMENSIONS - DICE_DIMENSIONS * 0.25
 DESTROY_DICE_X_START = SCREEN_WIDTH * (2 / 3) + DICE_DIMENSIONS / 2
-INSTRUCTION_DICE_Y_START = SCREEN_HEIGHT * 0.7
 
 MATCH_DICE_RULE_TEXT: str = 'When dice of the same number are placed in the same column, multiply their value.'
 DESTROY_OPPONENT_RULE_TEXT: str = 'Destroy your opponent\'s dice by matching yours to theirs.'
