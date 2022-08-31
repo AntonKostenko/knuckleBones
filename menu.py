@@ -3,6 +3,7 @@ import arcade
 from typing import List
 
 import constants as c
+from dice import Dice
 import game
 import instructions
 import settings
@@ -12,13 +13,20 @@ class MenuView(arcade.View):
     def __init__(self):
         super().__init__()
 
+        self.menu_dice = None
         self.menu_buttons = None
 
     def on_show_view(self):
         arcade.set_background_color(c.BACKGROUND_COLOR)
 
     def setup(self):
+        self.menu_dice: arcade.SpriteList = arcade.SpriteList()
         self.menu_buttons: arcade.SpriteList = arcade.SpriteList()
+
+        for i in range(3):
+            dice: Dice = Dice(6, scale=0.4)
+            dice.position = c.SCREEN_WIDTH / 2 - dice.width + dice.width * i, c.SCREEN_HEIGHT * 0.66 + 70
+            self.menu_dice.append(dice)
 
         for i in range(3):
             button: arcade.Sprite = arcade.SpriteSolidColor(c.MENU_BUTTON_WIDTH, c.MENU_BUTTON_HEIGHT,
@@ -30,11 +38,16 @@ class MenuView(arcade.View):
     def on_draw(self):
         self.clear()
 
+        for dice in self.menu_dice:
+            dice.draw()
+
         for button in self.menu_buttons:
             button.draw()
 
-        arcade.draw_text("Knuckle Bones", c.SCREEN_WIDTH / 2, c.SCREEN_HEIGHT * 0.75,
-                         arcade.color.WHITE, font_size=50, anchor_x="center", anchor_y="center")
+        arcade.draw_text("KNUCKLEBONES", c.SCREEN_WIDTH / 2, c.SCREEN_HEIGHT * 0.66,
+                         arcade.color.WHITE, font_size=80, anchor_x="center", anchor_y="center")
+        arcade.draw_text(c.MENU_SUB_TEXT, c.SCREEN_WIDTH / 2, c.SCREEN_HEIGHT * 0.66 - 100,
+                         arcade.color.WHITE, font_size=30, anchor_x="center", anchor_y="center")
 
         for i in range(len(c.MENU_BUTTON_NAMES)):
             arcade.draw_text(c.MENU_BUTTON_NAMES[i], self.menu_buttons[i].center_x, self.menu_buttons[i].center_y,

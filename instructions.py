@@ -5,7 +5,7 @@ from typing import List
 import constants as c
 from dice import Dice
 import game
-import main_menu
+import menu
 
 
 class InstructionView(arcade.View):
@@ -118,10 +118,12 @@ class InstructionView(arcade.View):
         tile_location: List[arcade.Sprite] = arcade.get_sprites_at_point((x, y), self.menu_buttons)
         if tile_location:
             if tile_location[0].properties['name'] == c.INSTRUCTION_BUTTON_NAMES[0]:
+                print("code hit")
                 game_view = game.KnuckleBones()
-                self.window.show_view(game_view)
                 game_view.setup()
+                self.window.show_view(game_view)
+
             elif tile_location[0].properties['name'] == c.INSTRUCTION_BUTTON_NAMES[1]:
-                main_menu_view = main_menu.MenuView()
+                main_menu_view = menu.MenuView()
                 self.window.show_view(main_menu_view)
                 main_menu_view.setup()

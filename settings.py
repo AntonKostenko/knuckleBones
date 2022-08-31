@@ -3,7 +3,7 @@ import arcade
 from typing import List
 
 import constants as c
-import main_menu
+import menu
 
 
 class SettingsView(arcade.View):
@@ -43,6 +43,6 @@ class SettingsView(arcade.View):
         tile_location: List[arcade.Sprite] = arcade.get_sprites_at_point((x, y), self.menu_buttons)
         if tile_location:
             if tile_location[0].properties['name'] == c.SETTINGS_BUTTON_NAMES[0]:
-                main_menu_view = main_menu.MenuView()
+                main_menu_view = menu.MenuView()
                 self.window.show_view(main_menu_view)
                 main_menu_view.setup()
