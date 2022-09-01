@@ -15,7 +15,6 @@ class SettingsView(arcade.View):
     def on_show_view(self):
         arcade.set_background_color(c.BACKGROUND_COLOR)
 
-    def setup(self):
         self.menu_buttons: arcade.SpriteList = arcade.SpriteList()
 
         for i in range(len(c.SETTINGS_BUTTON_NAMES)):
@@ -45,4 +44,3 @@ class SettingsView(arcade.View):
             if tile_location[0].properties['name'] == c.SETTINGS_BUTTON_NAMES[0]:
                 main_menu_view = menu.MenuView()
                 self.window.show_view(main_menu_view)
-                main_menu_view.setup()
