@@ -31,12 +31,11 @@ class InstructionView(arcade.View):
         self.destroy_dice: arcade.SpriteList = arcade.SpriteList()
 
         # Create some "mats" under the dice
-
         left_mat: arcade.Sprite = arcade.SpriteSolidColor(120, 120, c.TILE_COLOR)
         left_mat.position = c.INSTRUCTIONS_LEFT_MAT_X, c.INSTRUCTION_MAT_Y
         self.dice_mats.append(left_mat)
 
-        right_mat = arcade.Sprite = arcade.SpriteSolidColor(120, 120, c.TILE_COLOR)
+        right_mat: arcade.Sprite = arcade.SpriteSolidColor(120, 120, c.TILE_COLOR)
         right_mat.position = c.INSTRUCTIONS_RIGHT_MAT_X, c.INSTRUCTION_MAT_Y
         self.dice_mats.append(right_mat)
 
