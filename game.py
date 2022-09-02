@@ -50,6 +50,9 @@ class KnuckleBones(arcade.View):
         self.temp_sprite_destination = None
         self.temp_column_index = None
 
+        # Used to stop mouse spamming which can cause animation issues
+        self.mouse_debounce_timer = None
+
     def setup(self):
         self.player_one_score: int = 0
         self.player_one_column_scores: List[int] = [0, 0, 0]
@@ -101,6 +104,8 @@ class KnuckleBones(arcade.View):
         self.temp_dice_list: List = []
         self.temp_sprite_destination: Tuple = ()
         self.temp_column_index: int = 0
+
+        self.mouse_debounce_timer = 0
 
         # Player 1 dice tray
         bottom_tray: arcade.Sprite = arcade.SpriteSolidColor(c.DICE_TRAY_WIDTH, c.DICE_TRAY_HEIGHT, c.TILE_COLOR)
@@ -197,6 +202,8 @@ class KnuckleBones(arcade.View):
         """
         All the logic to move, and the game logic goes here.
         """
+        self.mouse_debounce_timer += delta_time
+
         if self.current_turn:
             self.player_one_current_dice.roll_dice_animation(delta_time)
         else:
@@ -213,7 +220,9 @@ class KnuckleBones(arcade.View):
             self.setup()
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
-        self.perform_turn(x, y)
+        if self.mouse_debounce_timer > 1:
+            self.perform_turn(x, y)
+            self.mouse_debounce_timer = 0
 
     def set_turn_values(self) -> None:
         self.temp_sprite_destination = ()
