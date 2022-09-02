@@ -14,6 +14,8 @@ class KnuckleBones(arcade.View):
         arcade.set_background_color(c.BACKGROUND_COLOR)
 
         self.current_turn = None
+        self.goes_first_name = None
+        self.first_turn = None
 
         self.player_one_score = None
         self.player_one_column_scores = None
@@ -49,6 +51,9 @@ class KnuckleBones(arcade.View):
         self.temp_dice_list = None
         self.temp_sprite_destination = None
         self.temp_column_index = None
+
+        # Used to stop mouse spamming which can cause animation issues
+        self.mouse_debounce_timer = None
 
     def setup(self):
         self.player_one_score: int = 0
@@ -102,6 +107,8 @@ class KnuckleBones(arcade.View):
         self.temp_sprite_destination: Tuple = ()
         self.temp_column_index: int = 0
 
+        self.mouse_debounce_timer = 0
+
         # Player 1 dice tray
         bottom_tray: arcade.Sprite = arcade.SpriteSolidColor(c.DICE_TRAY_WIDTH, c.DICE_TRAY_HEIGHT, c.TILE_COLOR)
         bottom_tray.position = c.BOTTOM_TRAY_X, c.BOTTOM_TRAY_Y
@@ -129,6 +136,8 @@ class KnuckleBones(arcade.View):
                 self.player_two_tile_group[i].append(tile)
 
         self.current_turn = self.roll_dice() % 2 == 0
+        self.first_turn: bool = True
+        self.goes_first()
         self.create_dice()
 
     def on_draw(self):
@@ -162,8 +171,9 @@ class KnuckleBones(arcade.View):
         arcade.draw_text(c.PLAYER_TWO, c.TOP_TRAY_X, c.TOP_TRAY_Y - c.DICE_TRAY_HEIGHT / 2 - 55, font_size=20,
                          anchor_x='center', anchor_y='center')
 
-        # arcade.draw_text(goes_first + ' \'s turn', c.SCREEN_WIDTH / 2, c.SCREEN_HEIGHT / 2 - 10, font_size=40,
-        #                  anchor_x='center')
+        if self.first_turn:
+            arcade.draw_text(self.goes_first_name + ' goes first', c.SCREEN_WIDTH / 2, c.SCREEN_HEIGHT / 2 - 10,
+                             font_size=40, anchor_x='center', anchor_y='center')
 
         # Draws the total score for each player if they have points
         if self.player_one_score > 0:
@@ -197,6 +207,8 @@ class KnuckleBones(arcade.View):
         """
         All the logic to move, and the game logic goes here.
         """
+        self.mouse_debounce_timer += delta_time
+
         if self.current_turn:
             self.player_one_current_dice.roll_dice_animation(delta_time)
         else:
@@ -205,6 +217,7 @@ class KnuckleBones(arcade.View):
         self.move_current_dice_to_position()
         if self.filter_dice():
             self.calculate_score()
+        self.set_multiplier_colors()
         self.move_remaining_dice_to_position()
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -212,7 +225,9 @@ class KnuckleBones(arcade.View):
             self.setup()
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
-        self.perform_turn(x, y)
+        if self.mouse_debounce_timer > 1:
+            self.perform_turn(x, y)
+            self.mouse_debounce_timer = 0
 
     def set_turn_values(self) -> None:
         self.temp_sprite_destination = ()
@@ -231,6 +246,15 @@ class KnuckleBones(arcade.View):
             self.opposite_dice_list = self.player_one_dice_list_group
             self.opposite_tile_group = self.player_one_tile_group
 
+    def goes_first(self) -> None:
+        """
+        Used to determine which player name to display.
+        """
+        if self.current_turn:
+            self.goes_first_name = c.PLAYER_ONE
+        else:
+            self.goes_first_name = c.PLAYER_TWO
+
     @staticmethod
     def roll_dice() -> int:
         """
@@ -243,7 +267,7 @@ class KnuckleBones(arcade.View):
         Creates a new Dice object and places it on the current turn player's mat
         """
         dice: Dice = Dice(self.roll_dice())
-        dice.speed = 40
+        dice.speed = 35
         if self.current_turn:
             dice.position = c.BOTTOM_TRAY_X, c.BOTTOM_TRAY_Y
             self.player_one_current_dice = dice
@@ -255,16 +279,19 @@ class KnuckleBones(arcade.View):
         """
         Modifies the color of the dice if the column has multiple dice with the same value.
         """
-        dice_count: dict[int, int] = self.get_dice_value_count(self.dice_list[self.temp_column_index])
-        # If the column is full of dice of the same value, set the dice color to the 3x modifier color
-        if 3 in dice_count.values():
-            for dice in self.dice_list[self.temp_column_index]:
-                dice.color = c.THREE_X_MOD_COLOR
-        # If the column has 2 dice of the same value, set their color to the 2x modifier color
-        elif 2 in dice_count.values():
-            for dice in self.dice_list[self.temp_column_index]:
-                if dice_count[dice.value] == 2:
-                    dice.color = c.TWO_X_MOD_COLOR
+        if not self.temp_sprite_destination:
+            return
+        if self.current_dice.center_x == self.temp_sprite_destination[0]:
+            dice_count: dict[int, int] = self.get_dice_value_count(self.dice_list[self.temp_column_index])
+            # If the column is full of dice of the same value, set the dice color to the 3x modifier color
+            if 3 in dice_count.values():
+                for dice in self.dice_list[self.temp_column_index]:
+                    dice.color = c.THREE_X_MOD_COLOR
+            # If the column has 2 dice of the same value, set their color to the 2x modifier color
+            elif 2 in dice_count.values():
+                for dice in self.dice_list[self.temp_column_index]:
+                    if dice_count[dice.value] == 2:
+                        dice.color = c.TWO_X_MOD_COLOR
 
     def perform_turn(self, x: int, y: int) -> None:
         """
@@ -278,22 +305,19 @@ class KnuckleBones(arcade.View):
             tile_location: List[arcade.Sprite] = arcade.get_sprites_at_point((x, y), self.tile_group[column_index])
             # If the column has an open spot for the dice, place dice in the lowest/highest open spot.
             if len(tile_location) > 0 and len(self.dice_list[column_index]) < 3:
-
+                self.first_turn = False
                 # Used to move current dice in the update() call
                 self.temp_sprite_destination = self.tile_group[column_index][len(self.dice_list[column_index])].position
 
                 # Grab index to use in various methods
                 self.temp_column_index = column_index
-
                 self.dice_list[column_index].append(self.current_dice)
-
-                self.set_multiplier_colors()
-
-                self.calculate_score()
 
                 if not self.is_board_full():
                     self.current_turn = not self.current_turn
                     self.create_dice()
+
+                self.calculate_score()
 
     def calculate_score(self) -> None:
         """
@@ -337,12 +361,14 @@ class KnuckleBones(arcade.View):
     def filter_dice(self) -> bool:
         """
         Takes a SpriteList opposite of the current dice column and animates removing
-        dice containing the value of the current dice.
+        dice containing the value of the current dice. Begins the animation when the current dice
+        gets to its destination.
         Used to update dice when the player attacks.
         Returns True if a die was destroyed, so we can recalculate the score
         """
         for dice in self.opposite_dice_list[self.temp_column_index]:
-            if dice.value == self.current_dice.value:
+            if dice.value == self.current_dice.value and self.current_dice.center_x == \
+                    self.opposite_dice_list[self.temp_column_index][0].center_x:
                 return dice.shrink_dice()
 
     def move_current_dice_to_position(self) -> None:
