@@ -14,6 +14,8 @@ class KnuckleBones(arcade.View):
         arcade.set_background_color(c.BACKGROUND_COLOR)
 
         self.current_turn = None
+        self.goes_first_name = None
+        self.first_turn = None
 
         self.player_one_score = None
         self.player_one_column_scores = None
@@ -134,6 +136,8 @@ class KnuckleBones(arcade.View):
                 self.player_two_tile_group[i].append(tile)
 
         self.current_turn = self.roll_dice() % 2 == 0
+        self.first_turn: bool = True
+        self.goes_first()
         self.create_dice()
 
     def on_draw(self):
@@ -167,8 +171,9 @@ class KnuckleBones(arcade.View):
         arcade.draw_text(c.PLAYER_TWO, c.TOP_TRAY_X, c.TOP_TRAY_Y - c.DICE_TRAY_HEIGHT / 2 - 55, font_size=20,
                          anchor_x='center', anchor_y='center')
 
-        # arcade.draw_text(goes_first + ' \'s turn', c.SCREEN_WIDTH / 2, c.SCREEN_HEIGHT / 2 - 10, font_size=40,
-        #                  anchor_x='center')
+        if self.first_turn:
+            arcade.draw_text(self.goes_first_name + ' goes first', c.SCREEN_WIDTH / 2, c.SCREEN_HEIGHT / 2 - 10,
+                             font_size=40, anchor_x='center', anchor_y='center')
 
         # Draws the total score for each player if they have points
         if self.player_one_score > 0:
@@ -241,6 +246,15 @@ class KnuckleBones(arcade.View):
             self.opposite_dice_list = self.player_one_dice_list_group
             self.opposite_tile_group = self.player_one_tile_group
 
+    def goes_first(self) -> None:
+        """
+        Used to determine which player name to display.
+        """
+        if self.current_turn:
+            self.goes_first_name = c.PLAYER_ONE
+        else:
+            self.goes_first_name = c.PLAYER_TWO
+
     @staticmethod
     def roll_dice() -> int:
         """
@@ -291,13 +305,12 @@ class KnuckleBones(arcade.View):
             tile_location: List[arcade.Sprite] = arcade.get_sprites_at_point((x, y), self.tile_group[column_index])
             # If the column has an open spot for the dice, place dice in the lowest/highest open spot.
             if len(tile_location) > 0 and len(self.dice_list[column_index]) < 3:
-
+                self.first_turn = False
                 # Used to move current dice in the update() call
                 self.temp_sprite_destination = self.tile_group[column_index][len(self.dice_list[column_index])].position
 
                 # Grab index to use in various methods
                 self.temp_column_index = column_index
-
                 self.dice_list[column_index].append(self.current_dice)
 
                 if not self.is_board_full():
