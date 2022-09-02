@@ -205,6 +205,7 @@ class KnuckleBones(arcade.View):
         self.move_current_dice_to_position()
         if self.filter_dice():
             self.calculate_score()
+        self.set_multiplier_colors()
         self.move_remaining_dice_to_position()
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -255,16 +256,19 @@ class KnuckleBones(arcade.View):
         """
         Modifies the color of the dice if the column has multiple dice with the same value.
         """
-        dice_count: dict[int, int] = self.get_dice_value_count(self.dice_list[self.temp_column_index])
-        # If the column is full of dice of the same value, set the dice color to the 3x modifier color
-        if 3 in dice_count.values():
-            for dice in self.dice_list[self.temp_column_index]:
-                dice.color = c.THREE_X_MOD_COLOR
-        # If the column has 2 dice of the same value, set their color to the 2x modifier color
-        elif 2 in dice_count.values():
-            for dice in self.dice_list[self.temp_column_index]:
-                if dice_count[dice.value] == 2:
-                    dice.color = c.TWO_X_MOD_COLOR
+        if not self.temp_sprite_destination:
+            return
+        if self.current_dice.center_x == self.temp_sprite_destination[0]:
+            dice_count: dict[int, int] = self.get_dice_value_count(self.dice_list[self.temp_column_index])
+            # If the column is full of dice of the same value, set the dice color to the 3x modifier color
+            if 3 in dice_count.values():
+                for dice in self.dice_list[self.temp_column_index]:
+                    dice.color = c.THREE_X_MOD_COLOR
+            # If the column has 2 dice of the same value, set their color to the 2x modifier color
+            elif 2 in dice_count.values():
+                for dice in self.dice_list[self.temp_column_index]:
+                    if dice_count[dice.value] == 2:
+                        dice.color = c.TWO_X_MOD_COLOR
 
     def perform_turn(self, x: int, y: int) -> None:
         """
@@ -287,13 +291,11 @@ class KnuckleBones(arcade.View):
 
                 self.dice_list[column_index].append(self.current_dice)
 
-                self.set_multiplier_colors()
-
-                self.calculate_score()
-
                 if not self.is_board_full():
                     self.current_turn = not self.current_turn
                     self.create_dice()
+
+                self.calculate_score()
 
     def calculate_score(self) -> None:
         """
