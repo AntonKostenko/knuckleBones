@@ -22,9 +22,6 @@ Made in Python using the Arcade engine.
 
 ## Roadmap
 
-### Visuals
-* Display who goes first
-
 ### Sounds/Effects
 * Background Music
 * Dice roll sound
@@ -32,10 +29,8 @@ Made in Python using the Arcade engine.
 * Lose sound (if vs AI)
 
 ### Opponent AI
-* Player vs easy AI
 * Player vs hard AI
 * AI vs AI
 
 ### Outside the game loop
-* How to play page
 * Other color themes
