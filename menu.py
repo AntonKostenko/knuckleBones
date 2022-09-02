@@ -24,7 +24,7 @@ class MenuView(arcade.View):
 
         for i in range(3):
             dice: Dice = Dice(6, scale=0.4)
-            dice.position = c.SCREEN_WIDTH / 2 - dice.width + dice.width * i, c.SCREEN_HEIGHT * 0.66 + 70
+            dice.position = c.SCREEN_WIDTH / 2 - dice.width + dice.width * i, c.SCREEN_HEIGHT * 0.66 + 50
             self.menu_dice.append(dice)
 
         for i in range(3):
