@@ -61,6 +61,9 @@ class KnuckleBones(arcade.View):
         # Amount of time before AU performs turn
         self.ai_timer = None
 
+        self.player_one_dicts = None
+        self.player_two_dicts = None
+
     def setup(self):
         self.player_one_score: int = 0
         self.player_one_column_scores: List[int] = [0, 0, 0]
@@ -153,6 +156,9 @@ class KnuckleBones(arcade.View):
         # Flag for setting easy AI
         self.vs_ai_easy: bool = True
 
+        self.player_one_dicts = [{}, {}, {}]
+        self.player_two_dicts = [{}, {}, {}]
+
     def on_draw(self):
         self.clear()
 
@@ -228,7 +234,7 @@ class KnuckleBones(arcade.View):
         else:
             self.player_two_current_dice.roll_dice_animation(delta_time)
 
-        self.perform_ai_turn()
+        self.perform_hard_ai_turn()
 
         self.move_current_dice_to_position()
         if self.filter_dice():
@@ -337,7 +343,10 @@ class KnuckleBones(arcade.View):
                     self.create_dice()
                 self.calculate_score()
 
-                self.mouse_debounce_timer = 0
+                if self.vs_ai_easy:
+                    self.mouse_debounce_timer = -2
+                else:
+                    self.mouse_debounce_timer = 0
                 self.ai_timer = 0
 
     def perform_ai_turn(self) -> None:
@@ -366,6 +375,46 @@ class KnuckleBones(arcade.View):
         self.calculate_score()
         self.ai_timer = 0
 
+    def perform_hard_ai_turn(self) -> None:
+        """
+        The logic used for a "hard" AI opponent.
+        The AI checks what columns have an open spot and selects the best spot.
+        """
+        if self.current_turn or self.ai_timer < 2 or self.is_board_full() or not self.vs_ai_easy:
+            return
+        self.set_turn_values()
+        self.first_turn = False
+        column_has_spot: List[int] = []
+        for index in range(len(self.tile_group)):
+            if len(self.dice_list[index]) < 3:
+                column_has_spot.append(index)
+        random_index: int = random.choice(column_has_spot)
+
+        print(self.player_two_dicts)
+        print(self.player_one_dicts)
+
+        for open_index in column_has_spot:
+            if self.player_two_current_dice.value in self.player_one_dicts[open_index]:
+                self.temp_sprite_destination = self.tile_group[open_index][len(self.dice_list[open_index])].position
+                self.temp_column_index = open_index
+                self.dice_list[open_index].append(self.current_dice)
+                break
+            if self.player_two_current_dice.value in self.player_two_dicts[open_index]:
+                self.temp_sprite_destination = self.tile_group[open_index][len(self.dice_list[open_index])].position
+                self.temp_column_index = open_index
+                self.dice_list[open_index].append(self.current_dice)
+                break
+        else:
+            self.temp_sprite_destination = self.tile_group[random_index][len(self.dice_list[random_index])].position
+            self.temp_column_index = random_index
+            self.dice_list[random_index].append(self.current_dice)
+
+        if not self.is_board_full():
+            self.current_turn = not self.current_turn
+            self.create_dice()
+        self.calculate_score()
+        self.ai_timer = 0
+
     def calculate_score(self) -> None:
         """
         Updates the column scores and total score for each player. If a player has more than 1 dice with the same value
@@ -380,6 +429,8 @@ class KnuckleBones(arcade.View):
 
             player_one_dict: dict[int, int] = self.get_dice_value_count(player_one_column)
             player_two_dict: dict[int, int] = self.get_dice_value_count(player_two_column)
+            self.player_one_dicts[index] = player_one_dict
+            self.player_two_dicts[index] = player_two_dict
 
             for key in player_one_dict:
                 self.player_one_column_scores[index] += key * player_one_dict[key] * player_one_dict[key]
