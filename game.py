@@ -55,6 +55,12 @@ class KnuckleBones(arcade.View):
         # Used to stop mouse spamming which can cause animation issues
         self.mouse_debounce_timer = None
 
+        # Flag for setting easy AI
+        self.vs_ai_easy = None
+
+        # Amount of time before AU performs turn
+        self.ai_timer = None
+
     def setup(self):
         self.player_one_score: int = 0
         self.player_one_column_scores: List[int] = [0, 0, 0]
@@ -107,7 +113,11 @@ class KnuckleBones(arcade.View):
         self.temp_sprite_destination: Tuple = ()
         self.temp_column_index: int = 0
 
-        self.mouse_debounce_timer = 0
+        # Debounce timer to stop some animation issues when spamming the mouse
+        self.mouse_debounce_timer: float = 0
+
+        # Time the AI waits before performing turn
+        self.ai_timer: float = 0
 
         # Player 1 dice tray
         bottom_tray: arcade.Sprite = arcade.SpriteSolidColor(c.DICE_TRAY_WIDTH, c.DICE_TRAY_HEIGHT, c.TILE_COLOR)
@@ -139,6 +149,9 @@ class KnuckleBones(arcade.View):
         self.first_turn: bool = True
         self.goes_first()
         self.create_dice()
+
+        # Flag for setting easy AI
+        self.vs_ai_easy: bool = True
 
     def on_draw(self):
         self.clear()
@@ -208,11 +221,14 @@ class KnuckleBones(arcade.View):
         All the logic to move, and the game logic goes here.
         """
         self.mouse_debounce_timer += delta_time
+        self.ai_timer += delta_time
 
         if self.current_turn:
             self.player_one_current_dice.roll_dice_animation(delta_time)
         else:
             self.player_two_current_dice.roll_dice_animation(delta_time)
+
+        self.perform_ai_turn()
 
         self.move_current_dice_to_position()
         if self.filter_dice():
@@ -226,8 +242,11 @@ class KnuckleBones(arcade.View):
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         if self.mouse_debounce_timer > 1:
-            self.perform_turn(x, y)
-            self.mouse_debounce_timer = 0
+            if self.vs_ai_easy:
+                if self.current_turn:
+                    self.perform_turn(x, y)
+            else:
+                self.perform_turn(x, y)
 
     def set_turn_values(self) -> None:
         self.temp_sprite_destination = ()
@@ -316,8 +335,36 @@ class KnuckleBones(arcade.View):
                 if not self.is_board_full():
                     self.current_turn = not self.current_turn
                     self.create_dice()
-
                 self.calculate_score()
+
+                self.mouse_debounce_timer = 0
+                self.ai_timer = 0
+
+    def perform_ai_turn(self) -> None:
+        """
+        The logic used for an "easy" AI opponent.
+        The AI checks what columns have an open spot and randomly selects one of them.
+        """
+        if self.current_turn or self.ai_timer < 2 or self.is_board_full() or not self.vs_ai_easy:
+            return
+        self.set_turn_values()
+        self.first_turn = False
+        column_has_spot: List[int] = []
+        for index in range(len(self.tile_group)):
+            if len(self.dice_list[index]) < 3:
+                column_has_spot.append(index)
+        random_index: int = random.choice(column_has_spot)
+
+        self.temp_sprite_destination = self.tile_group[random_index][len(self.dice_list[random_index])].position
+        # Grab index to use in various methods
+        self.temp_column_index = random_index
+        self.dice_list[random_index].append(self.current_dice)
+
+        if not self.is_board_full():
+            self.current_turn = not self.current_turn
+            self.create_dice()
+        self.calculate_score()
+        self.ai_timer = 0
 
     def calculate_score(self) -> None:
         """
