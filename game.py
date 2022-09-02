@@ -253,7 +253,7 @@ class KnuckleBones(arcade.View):
         Creates a new Dice object and places it on the current turn player's mat
         """
         dice: Dice = Dice(self.roll_dice())
-        dice.speed = 40
+        dice.speed = 35
         if self.current_turn:
             dice.position = c.BOTTOM_TRAY_X, c.BOTTOM_TRAY_Y
             self.player_one_current_dice = dice
@@ -348,12 +348,14 @@ class KnuckleBones(arcade.View):
     def filter_dice(self) -> bool:
         """
         Takes a SpriteList opposite of the current dice column and animates removing
-        dice containing the value of the current dice.
+        dice containing the value of the current dice. Begins the animation when the current dice
+        gets to its destination.
         Used to update dice when the player attacks.
         Returns True if a die was destroyed, so we can recalculate the score
         """
         for dice in self.opposite_dice_list[self.temp_column_index]:
-            if dice.value == self.current_dice.value:
+            if dice.value == self.current_dice.value and self.current_dice.center_x == \
+                    self.opposite_dice_list[self.temp_column_index][0].center_x:
                 return dice.shrink_dice()
 
     def move_current_dice_to_position(self) -> None:
