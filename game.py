@@ -4,12 +4,12 @@ import random
 from typing import List, Tuple
 
 import constants as c
-from Dice import Dice
+from dice import Dice
 
 
-class KnuckleBones(arcade.Window):
+class KnuckleBones(arcade.View):
     def __init__(self):
-        super().__init__(c.SCREEN_WIDTH, c.SCREEN_HEIGHT, c.SCREEN_TITLE)
+        super().__init__()
 
         arcade.set_background_color(c.BACKGROUND_COLOR)
 
@@ -380,13 +380,3 @@ class KnuckleBones(arcade.Window):
         else:
             winner: str = c.PLAYER_TWO
         return f'{winner} is the winner!'
-
-
-def main():
-    window = KnuckleBones()
-    window.setup()
-    window.run()
-
-
-if __name__ == '__main__':
-    main()
