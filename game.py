@@ -57,9 +57,14 @@ class KnuckleBones(arcade.View):
 
         # Flag for setting easy AI
         self.vs_ai_easy = None
+        # Flag for setting hard AI
+        self.vs_ai_hard = None
 
         # Amount of time before AU performs turn
         self.ai_timer = None
+
+        self.player_one_dicts = None
+        self.player_two_dicts = None
 
     def setup(self):
         self.player_one_score: int = 0
@@ -151,7 +156,12 @@ class KnuckleBones(arcade.View):
         self.create_dice()
 
         # Flag for setting easy AI
-        self.vs_ai_easy: bool = True
+        self.vs_ai_easy: bool = False
+        # Flag for setting hard AI
+        self.vs_ai_hard = True
+
+        self.player_one_dicts = [{}, {}, {}]
+        self.player_two_dicts = [{}, {}, {}]
 
     def on_draw(self):
         self.clear()
@@ -228,7 +238,10 @@ class KnuckleBones(arcade.View):
         else:
             self.player_two_current_dice.roll_dice_animation(delta_time)
 
-        self.perform_ai_turn()
+        if self.vs_ai_easy:
+            self.perform_easy_ai_turn()
+        elif self.vs_ai_hard:
+            self.perform_hard_ai_turn()
 
         self.move_current_dice_to_position()
         if self.filter_dice():
@@ -242,7 +255,7 @@ class KnuckleBones(arcade.View):
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         if self.mouse_debounce_timer > 1:
-            if self.vs_ai_easy:
+            if self.vs_ai_easy or self.vs_ai_hard:
                 if self.current_turn:
                     self.perform_turn(x, y)
             else:
@@ -325,46 +338,132 @@ class KnuckleBones(arcade.View):
             # If the column has an open spot for the dice, place dice in the lowest/highest open spot.
             if len(tile_location) > 0 and len(self.dice_list[column_index]) < 3:
                 self.first_turn = False
-                # Used to move current dice in the update() call
-                self.temp_sprite_destination = self.tile_group[column_index][len(self.dice_list[column_index])].position
 
-                # Grab index to use in various methods
-                self.temp_column_index = column_index
-                self.dice_list[column_index].append(self.current_dice)
+                self.finish_turn(column_index)
 
-                if not self.is_board_full():
-                    self.current_turn = not self.current_turn
-                    self.create_dice()
-                self.calculate_score()
+                if self.vs_ai_easy or self.vs_ai_hard:
+                    self.mouse_debounce_timer = -2
+                else:
+                    self.mouse_debounce_timer = 0
 
-                self.mouse_debounce_timer = 0
-                self.ai_timer = 0
-
-    def perform_ai_turn(self) -> None:
+    def perform_easy_ai_turn(self) -> None:
         """
         The logic used for an "easy" AI opponent.
         The AI checks what columns have an open spot and randomly selects one of them.
         """
-        if self.current_turn or self.ai_timer < 2 or self.is_board_full() or not self.vs_ai_easy:
+        if self.current_turn or self.ai_timer < 2 or self.is_board_full():
             return
         self.set_turn_values()
         self.first_turn = False
+
         column_has_spot: List[int] = []
         for index in range(len(self.tile_group)):
             if len(self.dice_list[index]) < 3:
                 column_has_spot.append(index)
         random_index: int = random.choice(column_has_spot)
 
-        self.temp_sprite_destination = self.tile_group[random_index][len(self.dice_list[random_index])].position
+        self.finish_turn(random_index)
+        self.mouse_debounce_timer = 0
+
+    def finish_turn(self, column_index: int) -> None:
+        """
+        Performs the functions needed at the end of each turn
+        """
+        # Used to move current dice in the update() call
+        self.temp_sprite_destination = self.tile_group[column_index][len(self.dice_list[column_index])].position
+
         # Grab index to use in various methods
-        self.temp_column_index = random_index
-        self.dice_list[random_index].append(self.current_dice)
+        self.temp_column_index = column_index
+        self.dice_list[column_index].append(self.current_dice)
 
         if not self.is_board_full():
             self.current_turn = not self.current_turn
             self.create_dice()
         self.calculate_score()
         self.ai_timer = 0
+
+    def get_non_full_column(self) -> List[int]:
+        """
+        Returns a list of column indexes containing an open spot for a die.
+        """
+        column_has_spot: List[int] = []
+        for index in range(len(self.tile_group)):
+            if len(self.dice_list[index]) < 3:
+                column_has_spot.append(index)
+        return column_has_spot
+
+    @staticmethod
+    def pick_best_column(tier_list: List[int], empty_column: List[int], column_has_spot: List[int]) -> int:
+        """
+        Pick the best option the AI has.
+        Returns the index of the best column.
+        """
+        # Go through the tier list and pick the best option.
+        for move_options in tier_list:
+            if move_options != -1:
+                return move_options
+        # If nothing in the tier list, pick a random empty column
+        if tier_list.count(-1) == 9 and empty_column:
+            return random.choice(empty_column)
+        # If no empty column, pick a random column containing an open spot
+        else:
+            return random.choice(column_has_spot)
+
+    def perform_hard_ai_turn(self) -> None:
+        """
+        The logic used for a "hard" AI opponent.
+        The AI checks what columns have an open spot and selects the best spot.
+        """
+        if self.current_turn or self.ai_timer < 2 or self.is_board_full():
+            return
+        self.set_turn_values()
+        self.first_turn = False
+
+        column_has_spot = self.get_non_full_column()
+        tier_list = [-1] * 7
+        empty_column = []
+
+        for open_index in column_has_spot:
+            self.fill_in_tier_list(open_index, tier_list)
+            # Check if a column is empty
+            if len(self.player_two_dicts[open_index]) == 0:
+                empty_column.append(open_index)
+
+        best_column = self.pick_best_column(tier_list, empty_column, column_has_spot)
+
+        self.finish_turn(best_column)
+        self.mouse_debounce_timer = 0
+
+    def fill_in_tier_list(self, index: int, tier_list: List[int]) -> List[int]:
+        """
+        The main AI brains. Creates a tier list of options for the AI to use.
+        """
+        if self.player_two_current_dice.value in self.player_two_dicts[index]:
+            # Check if AI can get a 3x multiplier
+            if self.player_two_dicts[index][self.player_two_current_dice.value] == 2:
+                tier_list[0] = index
+            # Check if AI can destroy an opponent dice without filling up AI's column
+            if self.player_two_current_dice.value in self.player_one_dicts[index] and \
+                    self.player_two_dicts[index][self.player_two_current_dice.value] < 2:
+                tier_list[4] = index
+        if self.player_two_current_dice.value in self.player_one_dicts[index]:
+            # Check if AI can destroy opponent's 3x multiplier
+            if self.player_one_dicts[index][self.player_two_current_dice.value] == 3:
+                tier_list[2] = index
+            # Check if AI can destroy opponent's 2x multiplier
+            if self.player_one_dicts[index][self.player_two_current_dice.value] == 2:
+                tier_list[3] = index
+        # Check if AI can get a 2x multiplier on a die 4 or greater
+        if self.player_two_current_dice.value in self.player_two_dicts[index] and \
+                self.player_two_current_dice.value > 3:
+            tier_list[1] = index
+        # Check if AI can destroy an opponent's dice
+        if self.player_two_current_dice.value in self.player_one_dicts[index]:
+            tier_list[5] = index
+        # Check if AI can get a 2x multiplier
+        if self.player_two_current_dice.value in self.player_two_dicts[index]:
+            tier_list[6] = index
+        return tier_list
 
     def calculate_score(self) -> None:
         """
@@ -380,6 +479,8 @@ class KnuckleBones(arcade.View):
 
             player_one_dict: dict[int, int] = self.get_dice_value_count(player_one_column)
             player_two_dict: dict[int, int] = self.get_dice_value_count(player_two_column)
+            self.player_one_dicts[index] = player_one_dict
+            self.player_two_dicts[index] = player_two_dict
 
             for key in player_one_dict:
                 self.player_one_column_scores[index] += key * player_one_dict[key] * player_one_dict[key]
