@@ -28,9 +28,5 @@ Made in Python using the Arcade engine.
 * Win sound
 * Lose sound (if vs AI)
 
-### Opponent AI
-* Player vs hard AI
-* AI vs AI
-
 ### Outside the game loop
 * Other color themes
