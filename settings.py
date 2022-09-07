@@ -7,19 +7,20 @@ import menu
 
 
 class SettingsView(arcade.View):
-    def __init__(self):
+    def __init__(self, color_scheme):
         super().__init__()
 
+        self.color_scheme = color_scheme
         self.menu_buttons = None
 
     def on_show_view(self):
-        arcade.set_background_color(c.BACKGROUND_COLOR)
+        arcade.set_background_color(self.color_scheme[4])
 
         self.menu_buttons: arcade.SpriteList = arcade.SpriteList()
 
         for i in range(len(c.SETTINGS_BUTTON_NAMES)):
             button: arcade.Sprite = arcade.SpriteSolidColor(c.MENU_BUTTON_WIDTH, c.MENU_BUTTON_HEIGHT,
-                                                            c.TILE_COLOR_LIST[i])
+                                                            self.color_scheme[3])
             button.position = c.SETTINGS_BUTTON_START + i * c.MENU_BUTTON_X_SPACING, c.SCREEN_HEIGHT / 3
             button.properties['name'] = c.SETTINGS_BUTTON_NAMES[i]
             self.menu_buttons.append(button)
@@ -36,11 +37,11 @@ class SettingsView(arcade.View):
         for i in range(len(c.SETTINGS_BUTTON_NAMES)):
             arcade.draw_text(c.SETTINGS_BUTTON_NAMES[i],
                              self.menu_buttons[i].center_x, self.menu_buttons[i].center_y,
-                             c.BACKGROUND_COLOR, font_size=20, anchor_x="center", anchor_y="center")
+                             self.color_scheme[4], font_size=20, anchor_x="center", anchor_y="center")
 
     def on_mouse_press(self, x, y, button, modifiers):
         tile_location: List[arcade.Sprite] = arcade.get_sprites_at_point((x, y), self.menu_buttons)
         if tile_location:
             if tile_location[0].properties['name'] == c.SETTINGS_BUTTON_NAMES[0]:
-                main_menu_view = menu.MenuView()
+                main_menu_view = menu.MenuView(self.color_scheme)
                 self.window.show_view(main_menu_view)

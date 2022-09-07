@@ -8,10 +8,11 @@ from dice import Dice
 
 
 class KnuckleBones(arcade.View):
-    def __init__(self):
+    def __init__(self, color_scheme):
         super().__init__()
+        self.color_scheme = color_scheme
 
-        arcade.set_background_color(c.COLOR_SCHEME5[4])
+        arcade.set_background_color(self.color_scheme[4])
 
         self.current_turn = None
         self.goes_first_name = None
@@ -64,8 +65,6 @@ class KnuckleBones(arcade.View):
         self.p2_dicts = None
         self.current_dicts = None
         self.opposite_dicts = None
-
-        self.color_scheme = None
 
     def setup(self):
         self.p1_score: int = 0
@@ -130,8 +129,6 @@ class KnuckleBones(arcade.View):
 
         # Time the AI waits before performing turn
         self.ai_timer: float = 0
-
-        self.color_scheme: List[arcade.color] = c.COLOR_SCHEME5
 
         # Player 1 dice tray
         bottom_tray: arcade.Sprite = arcade.SpriteSolidColor(c.DICE_TRAY_WIDTH, c.DICE_TRAY_HEIGHT, self.color_scheme[3])

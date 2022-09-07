@@ -6,7 +6,7 @@ import menu
 
 def main():
     window: arcade.Window = arcade.Window(c.SCREEN_WIDTH, c.SCREEN_HEIGHT, c.SCREEN_TITLE)
-    menu_view: menu.MenuView = menu.MenuView()
+    menu_view: menu.MenuView = menu.MenuView(c.COLOR_SCHEME3)
     window.show_view(menu_view)
     window.run()
 
