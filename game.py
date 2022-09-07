@@ -11,7 +11,7 @@ class KnuckleBones(arcade.View):
     def __init__(self):
         super().__init__()
 
-        arcade.set_background_color(c.BACKGROUND_COLOR)
+        arcade.set_background_color(c.COLOR_SCHEME5[4])
 
         self.current_turn = None
         self.goes_first_name = None
@@ -64,6 +64,8 @@ class KnuckleBones(arcade.View):
         self.p2_dicts = None
         self.current_dicts = None
         self.opposite_dicts = None
+
+        self.color_scheme = None
 
     def setup(self):
         self.p1_score: int = 0
@@ -129,13 +131,15 @@ class KnuckleBones(arcade.View):
         # Time the AI waits before performing turn
         self.ai_timer: float = 0
 
+        self.color_scheme: List[arcade.color] = c.COLOR_SCHEME5
+
         # Player 1 dice tray
-        bottom_tray: arcade.Sprite = arcade.SpriteSolidColor(c.DICE_TRAY_WIDTH, c.DICE_TRAY_HEIGHT, c.TILE_COLOR)
+        bottom_tray: arcade.Sprite = arcade.SpriteSolidColor(c.DICE_TRAY_WIDTH, c.DICE_TRAY_HEIGHT, self.color_scheme[3])
         bottom_tray.position = c.BOTTOM_TRAY_X, c.BOTTOM_TRAY_Y
         self.dice_trays.append(bottom_tray)
 
         # Player 2 dice tray
-        top_tray: arcade.Sprite = arcade.SpriteSolidColor(c.DICE_TRAY_WIDTH, c.DICE_TRAY_HEIGHT, c.TILE_COLOR)
+        top_tray: arcade.Sprite = arcade.SpriteSolidColor(c.DICE_TRAY_WIDTH, c.DICE_TRAY_HEIGHT, self.color_scheme[3])
         top_tray.position = c.TOP_TRAY_X, c.TOP_TRAY_Y
         self.dice_trays.append(top_tray)
 
@@ -143,7 +147,7 @@ class KnuckleBones(arcade.View):
         for i in range(len(self.p1_tile_group)):
             for j in range(3):
                 tile: arcade.Sprite = arcade.SpriteSolidColor(c.TILE_DIMENSIONS, c.TILE_DIMENSIONS,
-                                                              c.TILE_COLOR_LIST[i])
+                                                              self.color_scheme[2])
                 tile.position = c.BOARD_X_START + i * c.TILE_X_SPACING, c.BOTTOM_BOARD_Y - j * c.TILE_Y_SPACING
                 self.p1_tile_group[i].append(tile)
 
@@ -151,7 +155,7 @@ class KnuckleBones(arcade.View):
         for i in range(len(self.p2_tile_group)):
             for j in range(3):
                 tile: arcade.Sprite = arcade.SpriteSolidColor(c.TILE_DIMENSIONS, c.TILE_DIMENSIONS,
-                                                              c.TILE_COLOR_LIST[i])
+                                                              self.color_scheme[2])
                 tile.position = c.BOARD_X_START + i * c.TILE_X_SPACING, c.TOP_BOARD_Y + j * c.TILE_Y_SPACING
                 self.p2_tile_group[i].append(tile)
 
@@ -161,8 +165,8 @@ class KnuckleBones(arcade.View):
         self.create_dice()
 
         # Flags for setting AI difficulty
-        self.p1_mode = 'hard'
-        self.p2_mode = 'easy'
+        self.p1_mode = ''
+        self.p2_mode = ''
 
     def on_draw(self):
         self.clear()
@@ -330,12 +334,12 @@ class KnuckleBones(arcade.View):
             # If the column is full of dice of the same value, set the dice color to the 3x modifier color
             if 3 in dice_count.values():
                 for dice in self.dice_list[self.temp_column_index]:
-                    dice.color = c.THREE_X_MOD_COLOR
+                    dice.color = self.color_scheme[0]
             # If the column has 2 dice of the same value, set their color to the 2x modifier color
             elif 2 in dice_count.values():
                 for dice in self.dice_list[self.temp_column_index]:
                     if dice_count[dice.value] == 2:
-                        dice.color = c.TWO_X_MOD_COLOR
+                        dice.color = self.color_scheme[1]
 
     def perform_turn(self, x: int, y: int) -> None:
         """
