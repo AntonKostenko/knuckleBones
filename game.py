@@ -8,9 +8,13 @@ from dice import Dice
 
 
 class KnuckleBones(arcade.View):
-    def __init__(self, color_scheme):
+    def __init__(self, color_scheme, p1_mode='', p2_mode=''):
         super().__init__()
         self.color_scheme = color_scheme
+
+        # Flags for setting AI difficulty
+        self.p1_mode = p1_mode
+        self.p2_mode = p2_mode
 
         arcade.set_background_color(self.color_scheme[4])
 
@@ -53,10 +57,6 @@ class KnuckleBones(arcade.View):
 
         # Used to stop mouse spamming which can cause animation issues
         self.mouse_debounce_timer = None
-
-        # Flags for setting AI difficulty
-        self.p1_mode = None
-        self.p2_mode = None
 
         # Amount of time before AU performs turn
         self.ai_timer = None
@@ -160,10 +160,6 @@ class KnuckleBones(arcade.View):
         self.first_turn: bool = True
         self.goes_first()
         self.create_dice()
-
-        # Flags for setting AI difficulty
-        self.p1_mode = ''
-        self.p2_mode = ''
 
     def on_draw(self):
         self.clear()

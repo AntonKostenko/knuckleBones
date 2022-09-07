@@ -79,17 +79,14 @@ class InstructionView(arcade.View):
                          arcade.color.WHITE, font_size=20, anchor_x="center", anchor_y="center")
 
         # Draw the mats
-        for mat in self.dice_mats:
-            mat.draw()
+        self.dice_mats.draw()
 
         arcade.draw_line(c.INSTRUCTIONS_RIGHT_MAT_X - 50, c.INSTRUCTION_MAT_Y,
                          c.INSTRUCTIONS_RIGHT_MAT_X + 50, c.INSTRUCTION_MAT_Y, self.color_scheme[4], 4)
 
         # Draw the dice
-        for dice in self.match_dice:
-            dice.draw()
-        for dice in self.destroy_dice:
-            dice.draw()
+        self.match_dice.draw()
+        self.destroy_dice.draw()
 
         # Draw the "Match Dice" text
         arcade.draw_text('Match Dice', c.INSTRUCTIONS_LEFT_MAT_X, c.INSTRUCTION_MAT_Y - 100,
@@ -104,8 +101,8 @@ class InstructionView(arcade.View):
                          font_size=12, anchor_x="center", anchor_y="center", multiline=True, width=290, align='center')
 
         # Draw the menu buttons and their text
-        for button in self.menu_buttons:
-            button.draw()
+        self.menu_buttons.draw()
+
         for i in range(len(c.INSTRUCTION_BUTTON_NAMES)):
             arcade.draw_text(c.INSTRUCTION_BUTTON_NAMES[i],
                              self.menu_buttons[i].center_x, self.menu_buttons[i].center_y,
