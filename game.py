@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 import constants as c
 from dice import Dice
+import menu
 
 
 class KnuckleBones(arcade.View):
@@ -256,6 +257,9 @@ class KnuckleBones(arcade.View):
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.R:
             self.setup()
+        if symbol == arcade.key.M:
+            main_menu_view = menu.MenuView(self.color_scheme, self.p1_mode, self.p2_mode)
+            self.window.show_view(main_menu_view)
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         if self.mouse_debounce_timer > 1:

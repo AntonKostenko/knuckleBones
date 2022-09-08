@@ -121,5 +121,5 @@ class InstructionView(arcade.View):
                 game_view.setup()
                 self.window.show_view(game_view)
             elif tile_location[0].properties['name'] == c.INSTRUCTION_BUTTON_NAMES[1]:
-                main_menu_view = menu.MenuView(self.color_scheme)
+                main_menu_view = menu.MenuView(self.color_scheme, self.p1_mode, self.p2_mode)
                 self.window.show_view(main_menu_view)
