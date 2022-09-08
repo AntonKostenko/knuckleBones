@@ -1,4 +1,5 @@
 import arcade
+import arcade.color as color
 
 from typing import List
 
@@ -69,3 +70,11 @@ DESTROY_OPPONENT_RULE_TEXT: str = 'Destroy your opponent\'s dice by matching you
 
 SETTINGS_BUTTON_START: float = SCREEN_WIDTH / 2
 SETTINGS_BUTTON_NAMES: List[str] = ['Back']
+SETTINGS_MODE_NAMES: List[str] = ['Human', 'Easy', 'Hard']
+
+
+COLOR_SCHEME1 = [color.FLORAL_WHITE, color.PALE_SILVER, color.EERIE_BLACK, color.FLAME, color.BLACK_OLIVE]
+COLOR_SCHEME2 = [color.CELADON_BLUE, color.BLUE_GREEN, color.LIGHT_YELLOW, color.PEACH_PUFF, color.BITTERSWEET]
+COLOR_SCHEME3 = [color.DESERT_SAND, color.CHAMPAGNE, color.ASH_GREY, color.ARTICHOKE, color.EBONY]
+COLOR_SCHEME4 = [color.GREEN_YELLOW, color.BRONZE, color.RED_BROWN, color.RUST, color.DARK_SIENNA]
+COLOR_SCHEME5 = [color.THISTLE, color.LIGHT_GRAY, color.TAUPE_GRAY, color.LIGHT_GRAY, color.OUTER_SPACE]
