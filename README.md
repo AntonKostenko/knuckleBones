@@ -21,7 +21,8 @@ Made in Python using the Arcade engine.
 * Press the "R" key to start a new game.
 * Press the "M" key while in game to go to the main menu.
 
-![Screen Shot 2022-08-26 at 3 53 01 PM](https://user-images.githubusercontent.com/29261200/187005343-8deece7f-35bd-4c79-a3ad-6c3c58b792ae.png)
+![Screen Shot 2022-09-08 at 2 18 42 PM](https://user-images.githubusercontent.com/29261200/189230123-23107d6e-49c9-4017-ae46-f1c892dd7768.png)
+
 
 ## Roadmap
 
