@@ -9,8 +9,12 @@ import menu
 
 
 class InstructionView(arcade.View):
-    def __init__(self, color_scheme):
+    def __init__(self, color_scheme, p1_mode, p2_mode):
         super().__init__()
+
+        self.p1_mode = p1_mode
+        self.p2_mode = p2_mode
+
         self.color_scheme = color_scheme
         self.menu_buttons = None
 
@@ -113,7 +117,7 @@ class InstructionView(arcade.View):
         tile_location: List[arcade.Sprite] = arcade.get_sprites_at_point((x, y), self.menu_buttons)
         if tile_location:
             if tile_location[0].properties['name'] == c.INSTRUCTION_BUTTON_NAMES[0]:
-                game_view = game.KnuckleBones(self.color_scheme)
+                game_view = game.KnuckleBones(self.color_scheme, self.p1_mode, self.p2_mode)
                 game_view.setup()
                 self.window.show_view(game_view)
             elif tile_location[0].properties['name'] == c.INSTRUCTION_BUTTON_NAMES[1]:

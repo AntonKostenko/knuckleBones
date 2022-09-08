@@ -70,6 +70,7 @@ DESTROY_OPPONENT_RULE_TEXT: str = 'Destroy your opponent\'s dice by matching you
 
 SETTINGS_BUTTON_START: float = SCREEN_WIDTH / 2
 SETTINGS_BUTTON_NAMES: List[str] = ['Back']
+SETTINGS_MODE_NAMES: List[str] = ['Human', 'Easy', 'Hard']
 
 
 COLOR_SCHEME1 = [color.FLORAL_WHITE, color.PALE_SILVER, color.EERIE_BLACK, color.FLAME, color.BLACK_OLIVE]

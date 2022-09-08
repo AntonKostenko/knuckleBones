@@ -10,8 +10,11 @@ import settings
 
 
 class MenuView(arcade.View):
-    def __init__(self, color_scheme):
+    def __init__(self, color_scheme, p1_mode='Human', p2_mode='Easy'):
         super().__init__()
+
+        self.p1_mode = p1_mode
+        self.p2_mode = p2_mode
 
         self.color_scheme = color_scheme
         self.menu_dice = None
@@ -57,12 +60,12 @@ class MenuView(arcade.View):
         tile_location: List[arcade.Sprite] = arcade.get_sprites_at_point((x, y), self.menu_buttons)
         if tile_location:
             if tile_location[0].properties['name'] == c.MENU_BUTTON_NAMES[0]:
-                game_view = game.KnuckleBones(self.color_scheme)
+                game_view = game.KnuckleBones(self.color_scheme, self.p1_mode, self.p2_mode)
                 self.window.show_view(game_view)
                 game_view.setup()
             elif tile_location[0].properties['name'] == c.MENU_BUTTON_NAMES[1]:
-                instructions_view = instructions.InstructionView(self.color_scheme)
+                instructions_view = instructions.InstructionView(self.color_scheme, self.p1_mode, self.p2_mode)
                 self.window.show_view(instructions_view)
             elif tile_location[0].properties['name'] == c.MENU_BUTTON_NAMES[2]:
-                settings_view = settings.SettingsView(self.color_scheme)
+                settings_view = settings.SettingsView(self.color_scheme, self.p1_mode, self.p2_mode)
                 self.window.show_view(settings_view)

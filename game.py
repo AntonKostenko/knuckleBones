@@ -8,7 +8,7 @@ from dice import Dice
 
 
 class KnuckleBones(arcade.View):
-    def __init__(self, color_scheme, p1_mode='', p2_mode=''):
+    def __init__(self, color_scheme, p1_mode, p2_mode):
         super().__init__()
         self.color_scheme = color_scheme
 
@@ -237,14 +237,14 @@ class KnuckleBones(arcade.View):
             self.p2_current_dice.roll_dice_animation(delta_time)
 
         if self.current_turn:
-            if self.p1_mode == 'hard':
+            if self.p1_mode == 'Hard':
                 self.perform_hard_ai_turn()
-            if self.p1_mode == 'easy':
+            if self.p1_mode == 'Easy':
                 self.perform_easy_ai_turn()
         else:
-            if self.p2_mode == 'hard':
+            if self.p2_mode == 'Hard':
                 self.perform_hard_ai_turn()
-            if self.p2_mode == 'easy':
+            if self.p2_mode == 'Easy':
                 self.perform_easy_ai_turn()
 
         self.move_current_dice_to_position()
@@ -260,10 +260,10 @@ class KnuckleBones(arcade.View):
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         if self.mouse_debounce_timer > 1:
             if self.current_turn:
-                if self.p1_mode == '':
+                if self.p1_mode == 'Human':
                     self.perform_turn(x, y)
             else:
-                if self.p2_mode == '':
+                if self.p2_mode == 'Human':
                     self.perform_turn(x, y)
 
     def set_turn_values(self) -> None:
@@ -350,7 +350,7 @@ class KnuckleBones(arcade.View):
 
                 self.finish_turn(column_index)
 
-                if self.p1_mode != '' or self.p2_mode != '':
+                if self.p1_mode != 'Human' or self.p2_mode != 'Human':
                     self.mouse_debounce_timer = -2
                 else:
                     self.mouse_debounce_timer = 0
